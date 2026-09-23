@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مائلیج ٹریکر</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; text-align: center; }
+        h2 { color: #333; font-size: 24px; }
+        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        .mark-btn { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .export-btn { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>میرا مائلیج ٹریکر</h2>
+    <div class="box">
+        <h3>طے شدہ فاصلہ: <span id="totalKm">0.00</span> KM</h3>
+        <input type="text" id="reason" placeholder="یہاں جانے کی وجہ لکھیں (مثلاً: میٹنگ)">
+        <button class="mark-btn" onclick="markLocation()">📍 لوکیشن اور وجہ محفوظ کریں</button>
+    </div>
+    <button class="export-btn" onclick="downloadExcel()">📥 مہینے کے آخر میں ایکسل شیٹ ڈاؤن لوڈ کریں</button>
+    <button style="background-color: #dc3545; color: white; border: none; margin-top: 30px;" onclick="resetData()">⚠️ نیا مہینہ شروع کریں (پچھلا ڈیٹا صاف کریں)</button>
+
+    <script>
+        // موبائل کی میموری سے پرانا ریکارڈ اٹھائیں
+        let records = JSON.parse(localStorage.getItem('mileageRecords')) || [];
+        let totalDistance = parseFloat(localStorage.getItem('totalDistance')) || 0;
+        let lastLat = parseFloat(localStorage.getItem('lastLat')) || null;
+        let lastLon = parseFloat(localStorage.getItem('lastLon')) || null;
+
+        document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
+
+        function markLocation() {
+            let reason = document.getElementById('reason').value;
+            if (!reason) { 
+                alert("براہ کرم پہلے جانے کی وجہ لکھیں!"); 
+                return; 
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    let distance = 0;
+
+                    // اگر پچھلی لوکیشن موجود ہے تو فاصلہ نکالیں
+                    if (lastLat !== null && lastLon !== null) {
+                        distance = calculateDistance(lastLat, lastLon, lat, lon);
+                        totalDistance += distance;
+                    }
+
+                    lastLat = lat;
+                    lastLon = lon;
+                    
+                    let now = new Date();
+                    let date = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+                    let time = now.toLocaleTimeString();
+
+                    // ریکارڈ محفوظ کریں
+                    records.push({ date, time, lat, lon, totalDistance: totalDistance.toFixed(2), reason });
+                    
+                    localStorage.setItem('mileageRecords', JSON.stringify(records));
+                    localStorage.setItem('totalDistance', totalDistance);
+                    localStorage.setItem('lastLat', lastLat);
+                    localStorage.setItem('lastLon', lastLon);
+
+                    document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
+                    document.getElementById('reason').value = '';
+                    alert("✅ لوکیشن اور فاصلہ کامیابی سے محفوظ ہو گیا!");
+                }, () => { 
+                    alert("موبائل کی لوکیشن (GPS) آن کریں اور براؤزر کو اجازت دیں!"); 
+                }, { enableHighAccuracy: true });
+            } else { 
+                alert("آپ کا موبائل GPS سپورٹ نہیں کرتا۔"); 
+            }
+        }
+
+        // کلومیٹر کیلکولیٹ کرنے کا فارمولا (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            let R = 6371; // زمین کا ریڈیس کلومیٹر میں
+            let dLat = (lat2 - lat1) * Math.PI / 180;
+            let dLon = (lon2 - lon1) * Math.PI / 180;
+            let a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function downloadExcel() {
+            if (records.length === 0) { 
+                alert("ڈاؤن لوڈ کرنے کے لیے کوئی ریکارڈ موجود نہیں ہے!"); 
+                return; 
+            }
+            
+            // ایکسل شیٹ کا ہیڈر
+            let csvContent = "Date,Time,Latitude,Longitude,Total_Distance(KM),Reason\n";
+            records.forEach(row => {
+                csvContent += `${row.date},${row.time},${row.lat},${row.lon},${row.totalDistance},${row.reason}\n`;
+            });
+
+            // فائل بنانے اور ڈاؤن لوڈ کرنے کا عمل
+            let blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "Monthly_Mileage_Report.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function resetData() {
+            if(confirm("کیا آپ واقعی سارا پرانا ریکارڈ ڈیلیٹ کر کے نیا مہینہ شروع کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا۔")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
