@@ -9,6 +9,7 @@
         h2 { color: #333; font-size: 24px; }
         .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
         input, button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        .start-btn { background-color: #ff9800; color: white; border: none; cursor: pointer; font-weight: bold; }
         .mark-btn { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
         .export-btn { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
     </style>
@@ -16,7 +17,14 @@
 <body>
     <h2>میرا مائلیج ٹریکر</h2>
     <div class="box">
-        <h3>طے شدہ فاصلہ: <span id="totalKm">0.00</span> KM</h3>
+        <h3>ٹوٹل فاصلہ: <span id="totalKm">0.00</span> KM</h3>
+        
+        <!-- نیا بٹن -->
+        <button class="start-btn" onclick="setStartPoint()">🚀 نیا سفر یہاں سے شروع کریں (پچھلا فاصلہ کاٹ دیں)</button>
+        <p style="font-size: 12px; color: gray; margin-top: 5px;">نوٹ: گھر سے آفس پہنچ کر یہ دبائیں تاکہ گھر کا راستہ شامل نہ ہو۔</p>
+        
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+
         <input type="text" id="reason" placeholder="یہاں جانے کی وجہ لکھیں (مثلاً: میٹنگ)">
         <button class="mark-btn" onclick="markLocation()">📍 لوکیشن اور وجہ محفوظ کریں</button>
     </div>
@@ -24,7 +32,6 @@
     <button style="background-color: #dc3545; color: white; border: none; margin-top: 30px;" onclick="resetData()">⚠️ نیا مہینہ شروع کریں (پچھلا ڈیٹا صاف کریں)</button>
 
     <script>
-        // موبائل کی میموری سے پرانا ریکارڈ اٹھائیں
         let records = JSON.parse(localStorage.getItem('mileageRecords')) || [];
         let totalDistance = parseFloat(localStorage.getItem('totalDistance')) || 0;
         let lastLat = parseFloat(localStorage.getItem('lastLat')) || null;
@@ -32,6 +39,26 @@
 
         document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
 
+        // صرف سٹارٹنگ پوائنٹ سیٹ کرنے کے لیے (بغیر فاصلہ کاؤنٹ کیے)
+        function setStartPoint() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    lastLat = position.coords.latitude;
+                    lastLon = position.coords.longitude;
+                    
+                    localStorage.setItem('lastLat', lastLat);
+                    localStorage.setItem('lastLon', lastLon);
+                    
+                    alert("✅ نئی شروعات سیٹ ہو گئی! اب اگلی جگہ پہنچ کر مارک کریں گے تو پچھلا فاصلہ شامل نہیں ہوگا۔");
+                }, () => { 
+                    alert("موبائل کی لوکیشن (GPS) آن کریں اور براؤزر کو اجازت دیں!"); 
+                }, { enableHighAccuracy: true });
+            } else { 
+                alert("آپ کا موبائل GPS سپورٹ نہیں کرتا۔"); 
+            }
+        }
+
+        // فاصلہ کاؤنٹ کرنے اور محفوظ کرنے کے لیے
         function markLocation() {
             let reason = document.getElementById('reason').value;
             if (!reason) { 
@@ -45,7 +72,6 @@
                     let lon = position.coords.longitude;
                     let distance = 0;
 
-                    // اگر پچھلی لوکیشن موجود ہے تو فاصلہ نکالیں
                     if (lastLat !== null && lastLon !== null) {
                         distance = calculateDistance(lastLat, lastLon, lat, lon);
                         totalDistance += distance;
@@ -55,11 +81,10 @@
                     lastLon = lon;
                     
                     let now = new Date();
-                    let date = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+                    let date = now.toLocaleDateString('en-GB'); 
                     let time = now.toLocaleTimeString();
 
-                    // ریکارڈ محفوظ کریں
-                    records.push({ date, time, lat, lon, totalDistance: totalDistance.toFixed(2), reason });
+                    records.push({ date, time, lat, lon, tripDistance: distance.toFixed(2), totalDistance: totalDistance.toFixed(2), reason });
                     
                     localStorage.setItem('mileageRecords', JSON.stringify(records));
                     localStorage.setItem('totalDistance', totalDistance);
@@ -70,16 +95,15 @@
                     document.getElementById('reason').value = '';
                     alert("✅ لوکیشن اور فاصلہ کامیابی سے محفوظ ہو گیا!");
                 }, () => { 
-                    alert("موبائل کی لوکیشن (GPS) آن کریں اور براؤزر کو اجازت دیں!"); 
+                    alert("موبائل کی لوکیشن (GPS) آن کریں!"); 
                 }, { enableHighAccuracy: true });
             } else { 
                 alert("آپ کا موبائل GPS سپورٹ نہیں کرتا۔"); 
             }
         }
 
-        // کلومیٹر کیلکولیٹ کرنے کا فارمولا (Haversine formula)
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            let R = 6371; // زمین کا ریڈیس کلومیٹر میں
+            let R = 6371; 
             let dLat = (lat2 - lat1) * Math.PI / 180;
             let dLon = (lon2 - lon1) * Math.PI / 180;
             let a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
@@ -93,13 +117,12 @@
                 return; 
             }
             
-            // ایکسل شیٹ کا ہیڈر
-            let csvContent = "Date,Time,Latitude,Longitude,Total_Distance(KM),Reason\n";
+            // ہیڈر میں Trip_Distance شامل کر دیا گیا ہے
+            let csvContent = "Date,Time,Latitude,Longitude,Trip_Distance(KM),Total_Distance(KM),Reason\n";
             records.forEach(row => {
-                csvContent += `${row.date},${row.time},${row.lat},${row.lon},${row.totalDistance},${row.reason}\n`;
+                csvContent += `${row.date},${row.time},${row.lat},${row.lon},${row.tripDistance || 0},${row.totalDistance},${row.reason}\n`;
             });
 
-            // فائل بنانے اور ڈاؤن لوڈ کرنے کا عمل
             let blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
             let url = URL.createObjectURL(blob);
