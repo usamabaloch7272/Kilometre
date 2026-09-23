@@ -12,6 +12,8 @@
         .start-btn { background-color: #ff9800; color: white; border: none; cursor: pointer; font-weight: bold; }
         .mark-btn { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
         .export-btn { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .input-group { text-align: right; margin-bottom: 10px; }
+        .input-group label { font-weight: bold; font-size: 14px; color: #555; }
     </style>
 </head>
 <body>
@@ -19,37 +21,53 @@
     <div class="box">
         <h3>ٹوٹل فاصلہ: <span id="totalKm">0.00</span> KM</h3>
         
-        <!-- نیا بٹن -->
-        <button class="start-btn" onclick="setStartPoint()">🚀 نیا سفر یہاں سے شروع کریں (پچھلا فاصلہ کاٹ دیں)</button>
-        <p style="font-size: 12px; color: gray; margin-top: 5px;">نوٹ: گھر سے آفس پہنچ کر یہ دبائیں تاکہ گھر کا راستہ شامل نہ ہو۔</p>
+        <div class="input-group">
+            <label>آپ ابھی کس علاقے میں ہیں؟</label>
+            <input type="text" id="locationName" placeholder="علاقے کا نام لکھیں (جیسے: لیاری، کلفٹن)">
+        </div>
+
+        <button class="start-btn" onclick="setStartPoint()">🚀 نیا سفر یہاں سے شروع کریں</button>
+        <p style="font-size: 12px; color: gray; margin-top: 5px;">پہلی بار گھر سے نکلتے وقت موجودہ علاقے کا نام لکھ کر یہ دبائیں</p>
         
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
 
-        <input type="text" id="reason" placeholder="یہاں جانے کی وجہ لکھیں (مثلاً: میٹنگ)">
-        <button class="mark-btn" onclick="markLocation()">📍 لوکیشن اور وجہ محفوظ کریں</button>
+        <div class="input-group">
+            <label>یہاں آنے کی وجہ؟</label>
+            <input type="text" id="reason" placeholder="وجہ لکھیں (مثلاً: فائل دینی تھی)">
+        </div>
+        
+        <button class="mark-btn" onclick="markLocation()">📍 منزل مقصود محفوظ کریں</button>
     </div>
-    <button class="export-btn" onclick="downloadExcel()">📥 مہینے کے آخر میں ایکسل شیٹ ڈاؤن لوڈ کریں</button>
-    <button style="background-color: #dc3545; color: white; border: none; margin-top: 30px;" onclick="resetData()">⚠️ نیا مہینہ شروع کریں (پچھلا ڈیٹا صاف کریں)</button>
+    <button class="export-btn" onclick="downloadExcel()">📥 مہینے کی مکمل ایکسل شیٹ ڈاؤن لوڈ کریں</button>
+    <button style="background-color: #dc3545; color: white; border: none; margin-top: 30px;" onclick="resetData()">⚠️ نیا مہینہ شروع کریں (پچھلا سارا ڈیٹا صاف کریں)</button>
 
     <script>
         let records = JSON.parse(localStorage.getItem('mileageRecords')) || [];
         let totalDistance = parseFloat(localStorage.getItem('totalDistance')) || 0;
         let lastLat = parseFloat(localStorage.getItem('lastLat')) || null;
         let lastLon = parseFloat(localStorage.getItem('lastLon')) || null;
+        let lastLocationName = localStorage.getItem('lastLocationName') || "نامعلوم علاقہ";
 
         document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
 
-        // صرف سٹارٹنگ پوائنٹ سیٹ کرنے کے لیے (بغیر فاصلہ کاؤنٹ کیے)
         function setStartPoint() {
+            let currentLocName = document.getElementById('locationName').value;
+            if (!currentLocName) {
+                alert("براہ کرم پہلے علاقے کا نام لکھیں جہاں سے آپ سفر شروع کر رہے ہیں!");
+                return;
+            }
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     lastLat = position.coords.latitude;
                     lastLon = position.coords.longitude;
+                    lastLocationName = currentLocName; // نیا علاقہ یاد کر لیا
                     
                     localStorage.setItem('lastLat', lastLat);
                     localStorage.setItem('lastLon', lastLon);
+                    localStorage.setItem('lastLocationName', lastLocationName);
                     
-                    alert("✅ نئی شروعات سیٹ ہو گئی! اب اگلی جگہ پہنچ کر مارک کریں گے تو پچھلا فاصلہ شامل نہیں ہوگا۔");
+                    alert("✅ شروعات سیٹ ہو گئی! (" + lastLocationName + ") سے سفر شروع۔");
                 }, () => { 
                     alert("موبائل کی لوکیشن (GPS) آن کریں اور براؤزر کو اجازت دیں!"); 
                 }, { enableHighAccuracy: true });
@@ -58,11 +76,12 @@
             }
         }
 
-        // فاصلہ کاؤنٹ کرنے اور محفوظ کرنے کے لیے
         function markLocation() {
+            let currentLocName = document.getElementById('locationName').value;
             let reason = document.getElementById('reason').value;
-            if (!reason) { 
-                alert("براہ کرم پہلے جانے کی وجہ لکھیں!"); 
+            
+            if (!currentLocName || !reason) { 
+                alert("براہ کرم علاقے کا نام اور جانے کی وجہ دونوں لکھیں!"); 
                 return; 
             }
 
@@ -71,29 +90,44 @@
                     let lat = position.coords.latitude;
                     let lon = position.coords.longitude;
                     let distance = 0;
+                    
+                    // پچھلے علاقے سے نئے علاقے کا روٹ بنائیں
+                    let fullRoute = lastLocationName + " to " + currentLocName;
 
                     if (lastLat !== null && lastLon !== null) {
                         distance = calculateDistance(lastLat, lastLon, lat, lon);
                         totalDistance += distance;
                     }
 
+                    // اگلی باری کے لیے موجودہ علاقے کو پچھلا علاقہ بنا دیں
                     lastLat = lat;
                     lastLon = lon;
+                    lastLocationName = currentLocName;
                     
                     let now = new Date();
                     let date = now.toLocaleDateString('en-GB'); 
                     let time = now.toLocaleTimeString();
 
-                    records.push({ date, time, lat, lon, tripDistance: distance.toFixed(2), totalDistance: totalDistance.toFixed(2), reason });
+                    // ریکارڈ محفوظ کریں
+                    records.push({ 
+                        date: date, 
+                        time: time, 
+                        route: fullRoute, 
+                        tripDistance: distance.toFixed(2), 
+                        totalDistance: totalDistance.toFixed(2), 
+                        reason: reason 
+                    });
                     
                     localStorage.setItem('mileageRecords', JSON.stringify(records));
                     localStorage.setItem('totalDistance', totalDistance);
                     localStorage.setItem('lastLat', lastLat);
                     localStorage.setItem('lastLon', lastLon);
+                    localStorage.setItem('lastLocationName', lastLocationName);
 
                     document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
+                    document.getElementById('locationName').value = '';
                     document.getElementById('reason').value = '';
-                    alert("✅ لوکیشن اور فاصلہ کامیابی سے محفوظ ہو گیا!");
+                    alert("✅ روٹ: (" + fullRoute + ") کامیابی سے محفوظ ہو گیا!");
                 }, () => { 
                     alert("موبائل کی لوکیشن (GPS) آن کریں!"); 
                 }, { enableHighAccuracy: true });
@@ -117,17 +151,17 @@
                 return; 
             }
             
-            // ہیڈر میں Trip_Distance شامل کر دیا گیا ہے
-            let csvContent = "Date,Time,Latitude,Longitude,Trip_Distance(KM),Total_Distance(KM),Reason\n";
+            // شیٹ میں اب Route (راستہ) کا کالم شامل کر دیا گیا ہے
+            let csvContent = "Date,Time,Route(Area to Area),Trip_Distance(KM),Total_Distance(KM),Reason\n";
             records.forEach(row => {
-                csvContent += `${row.date},${row.time},${row.lat},${row.lon},${row.tripDistance || 0},${row.totalDistance},${row.reason}\n`;
+                csvContent += `${row.date},${row.time},${row.route},${row.tripDistance},${row.totalDistance},${row.reason}\n`;
             });
 
             let blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
             let url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", "Monthly_Mileage_Report.csv");
+            link.setAttribute("download", "Company_Mileage_Report.csv");
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
@@ -135,7 +169,7 @@
         }
 
         function resetData() {
-            if(confirm("کیا آپ واقعی سارا پرانا ریکارڈ ڈیلیٹ کر کے نیا مہینہ شروع کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا۔")) {
+            if(confirm("کیا آپ واقعی سارا پرانا ریکارڈ ڈیلیٹ کر کے نیا مہینہ شروع کرنا چاہتے ہیں؟")) {
                 localStorage.clear();
                 location.reload();
             }
