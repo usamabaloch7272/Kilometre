@@ -20,89 +20,45 @@
         .export-btn { background: linear-gradient(135deg, #a8ff78, #78ffd6); color: #0f2027; margin-top: 15px; }
         .reset-btn { background: transparent; border: 1px solid #ff4b2b; color: #ff4b2b; margin-top: 25px; box-shadow: none; }
         .reset-btn:hover { background: #ff4b2b; color: white; }
-        .google-btn { background: #4285F4; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; }
         #cloudStatus { font-size: 14px; color: #00ff88; display: none; margin-top: 10px; font-weight: bold; }
-        #appContent { display: none; } /* لاک کھلنے تک ایپ چھپی رہے گی */
-        #lockScreen { text-align: center; padding: 50px 20px; }
     </style>
 </head>
 <body>
 
-    
+    <h2>✨ پریمیم مائلیج ٹریکر</h2>
 
-    <!-- اصل ایپ کا مواد (لاک کھلنے کے بعد نظر آئے گا) -->
-    <div id="appContent">
-        <h2>✨ پریمیم مائلیج ٹریکر</h2>
-
-        <div class="box">
-            <div class="input-group">
-                <label>آپ کا نام</label>
-                <input type="text" id="username" placeholder="Enter your name" onblur="saveName()">
-            </div>
-            <button class="google-btn" onclick="loginWithGoogle()">🌐 گوگل اکاؤنٹ سے جڑیں</button>
+    <div class="box">
+        <div class="input-group">
+            <label>آپ کا نام</label>
+            <input type="text" id="username" placeholder="Enter your name" onblur="saveName()">
         </div>
-
-        <div class="box">
-            <h3>📊 کل طے شدہ فاصلہ</h3>
-            <p><span id="totalKM">0.00</span> KM</p>
-        </div>
-
-        <div class="box">
-            <div class="input-group">
-                <label>آپ ابھی کس علاقے میں ہیں؟</label>
-                <input type="text" id="locationName" placeholder="علاقے کا نام (مثلاً: آفس)">
-            </div>
-            <button class="start-btn" onclick="setStartPoint()">🚀 نیا سفر یہاں سے شروع کریں</button>
-
-            <div class="input-group" style="margin-top: 20px;">
-                <label>یہاں آنے کی وجہ؟</label>
-                <input type="text" id="reason" placeholder="وجہ لکھیں (مثلاً: لیاری وزٹ)">
-            </div>
-            <button class="mark-btn" onclick="markLocation()">📍 منزل مقصود محفوظ کریں</button>
-            <div id="cloudStatus">✔ ڈیٹا گوگل شیٹ میں محفوظ ہو گیا ☁</div>
-        </div>
-
-        <button class="export-btn" onclick="downloadExcel()">📥 مائلیج کی مکمل ایکسل شیٹ ڈاؤن لوڈ کریں</button>
-        <button class="reset-btn" onclick="resetData()">⚠️ نیا مہینہ شروع کریں</button>
     </div>
 
-    
-        // یہاں اپنا گوگل اسکرپٹ کا نیا ویب ایپ لنک لازمی درج کریں
-        const GOOGLE_SHEET_URL ="https://script.google.com/macros/s/AKfycbwj68EWDVG4vDXezTeAs1kSvwK2AS0LeEM2WtUHdZK0fI7Pmy88I3UK_QSH64bZu-s/exec" "यहाँ_اپنا_گوگل_شیٹ_کا_لنک_لکھیں";
-    
-     <script>
+    <div class="box">
+        <h3>📊 کل طے شدہ فاصلہ</h3>
+        <p><span id="totalKM">0.00</span> KM</p>
+    </div>
 
-        // فنگر پرنٹ / بائیومیٹرک لاک کا فنکشن
-        async function authenticateUser() {
-            try {
-                if (window.PublicKeyCredential) {
-                    // موبائل کا سکرین لاک یا بائیومیٹرک پراम्प्ट مانگنے کا طریقہ
-                    let authenticated = confirm("کیا آپ فنگر پرنٹ یا سکرین لاک کی تصدیق کرنا چاہتے ہیں؟");
-                    if (authenticated) {
-                        document.getElementById('lockScreen').style.display = 'none';
-                        document.getElementById('appContent').style.display = 'block';
-                    }
-                } else {
-                    document.getElementById('lockScreen').style.display = 'none';
-                    document.getElementById('appContent').style.display = 'block';
-                }
-            } catch (e) {
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('appContent').style.display = 'block';
-            }
-        }
+    <div class="box">
+        <div class="input-group">
+            <label>آپ ابھی کس علاقے میں ہیں؟</label>
+            <input type="text" id="locationName" placeholder="علاقے کا نام (مثلاً: لیاری)">
+        </div>
+        <button class="start-btn" onclick="setStartPoint()">🚀 نیا سفر یہاں سے شروع کریں</button>
 
-        // خودکار طور پر ایپ کھلتے ہی لاک چیک کرنا چاہیں تو یہاں سے کر سکتے ہیں، فی الحال بٹن رکھا ہے
-        // آپ چاہیں تو صفحہ لوڈ ہوتے ہی authenticateUser() چلا سکتے ہیں
+        <div class="input-group" style="margin-top: 20px;">
+            <label>یہاں آنے کی وجہ؟</label>
+            <input type="text" id="reason" placeholder="وجہ لکھیں (مثلاً: میٹنگ)">
+        </div>
+        <button class="mark-btn" onclick="markLocation()">📍 منزل مقصود محفوظ کریں</button>
+        <div id="cloudStatus">✔ ڈیٹا گوگل شیٹ میں محفوظ ہو گیا ☁</div>
+    </div>
 
-        function loginWithGoogle() {
-            let email = prompt("اپنا گوگل جی میل (Gmail) اکاؤنٹ درج کریں:");
-            if (email) {
-                document.getElementById('username').value = email;
-                saveName();
-                alert(`✔ کامیابی سے ${email} کے ساتھ جڑ گئے!`);
-            }
-        }
+    <button class="export-btn" onclick="downloadExcel()">📥 مائلیج کی مکمل ایکسل شیٹ ڈاؤن لوڈ کریں</button>
+    <button class="reset-btn" onclick="resetData()">⚠️ نیا مہینہ شروع کریں</button>
+
+    <script>
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyUxOnuMkcWkrCUrMraRF2I1KUmgdFiUVP0QsCPdbcGDkt1-npTwUqA7-H9ClmCNWYD/exec";
 
         let records = JSON.parse(localStorage.getItem('mileageRecords')) || [];
         let totalDistance = parseFloat(localStorage.getItem('totalDistance')) || 0;
@@ -175,10 +131,12 @@
                 let fullRoute = lastLocationName + " to " + currentLocname;
 
                 let now = new Date();
-                let date = now.toLocaleDateString('en-GB'); // صرف تاریخ (بغیر ٹائم کے)
+                let date = now.toLocaleDateString('en-GB');
+                let time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
                 let rowData = {
                     date: date,
+                    time: time,
                     userName: userName,
                     route: fullRoute,
                     tripDistance: distance.toFixed(2),
@@ -221,10 +179,10 @@
             
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += `Employee Name: ${userName}\nMonth: ${currentMonth}\n\n`;
-            csvContent += "Date,Route,Trip Distance,Total Distance,Reason\n";
+            csvContent += "Date,Time,Route,Trip Distance,Total Distance,Reason\n";
 
             records.forEach(row => {
-                csvContent += `${row.date},"${row.route}",${row.tripDistance},${row.totalDistance},"${row.reason}"\n`;
+                csvContent += `${row.date},${row.time},"${row.route}",${row.tripDistance},${row.totalDistance},"${row.reason}"\n`;
             });
 
             let encodedUri = encodeURI(csvContent);
