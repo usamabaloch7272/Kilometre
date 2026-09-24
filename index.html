@@ -3,162 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> مائلیج ٹریکر</title>
-    <!-- لگژری فونٹس اور ڈیزائن -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>مائلیج ٹریکر</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Poppins', 'Noto Nastaliq Urdu', sans-serif; 
-            padding: 20px; 
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* لگژری ڈارک بیک گراؤنڈ */
-            color: #ffffff; 
-            text-align: center; 
-            margin: 0;
-            min-height: 100vh;
-        }
-        h2 { 
-            color: #d4af37; /* گولڈن کلر */
-            font-size: 26px; 
-            font-weight: 700;
-            text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
-            margin-bottom: 30px;
-        }
-        .box { 
-            background: rgba(255, 255, 255, 0.05); /* گلاس ایفیکٹ */
-            padding: 25px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255, 215, 0, 0.2); /* ہلکا گولڈن بارڈر */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
-            backdrop-filter: blur(8px); 
-            margin-bottom: 25px; 
-        }
+        body { font-family: 'Poppins', sans-serif; padding: 20px; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #ffffff; text-align: center; margin: 0; min-height: 100vh; }
+        h2 { color: #d4af37; font-size: 26px; font-weight: 700; text-shadow: 0px 4px 10px rgba(0,0,0,0.5); margin-bottom: 30px; }
+        .box { background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(255, 215, 0, 0.2); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); backdrop-filter: blur(8px); margin-bottom: 25px; }
         h3 { color: #f8f9fa; font-size: 20px; font-weight: 300; }
         #totalKm { color: #d4af37; font-weight: 700; font-size: 28px; }
-        
         .input-group { text-align: right; margin-bottom: 15px; }
         .input-group label { font-size: 13px; color: #a8b2d1; margin-bottom: 5px; display: block; }
-        
-        input { 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 10px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(0, 0, 0, 0.2); 
-            color: #ffffff; 
-            font-size: 15px; 
-            box-sizing: border-box; 
-            outline: none;
-            transition: 0.3s;
-        }
+        input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2); color: #ffffff; font-size: 15px; box-sizing: border-box; outline: none; transition: 0.3s; }
         input:focus { border-color: #d4af37; background: rgba(0, 0, 0, 0.4); }
-        input::placeholder { color: #718096; }
-
-        button { 
-            width: 100%; 
-            padding: 16px; 
-            margin: 10px 0; 
-            border-radius: 12px; 
-            border: none; 
-            font-size: 16px; 
-            font-weight: bold;
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
-        }
+        button { width: 100%; padding: 16px; margin: 10px 0; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0px 4px 15px rgba(0,0,0,0.2); }
         button:active { transform: scale(0.98); }
-        
         .start-btn { background: linear-gradient(135deg, #f5af19, #f12711); color: white; }
         .mark-btn { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
         .export-btn { background: linear-gradient(135deg, #3a7bd5, #3a6073); color: white; margin-top: 15px; }
         .reset-btn { background: transparent; border: 1px solid #ff4b2b; color: #ff4b2b; margin-top: 25px; box-shadow: none; }
-        
         hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 25px 0; }
+        #cloudStatus { font-size: 14px; color: #00ff00; display: none; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h2>✨ M3 mileage Tracker </h2>
+    <h2>✨ پریمیم مائلیج ٹریکر</h2>
     
     <div class="box">
         <div class="input-group">
-            <label>آپ کا نام (یہ نام ایکسل شیٹ پر پرنٹ ہوگا)</label>
-            <input type="text" id="userName" placeholder=" ( اپنا پورا نام لکھیں  )" onblur="saveName()">
+            <label>آپ کا نام</label>
+            <input type="text" id="userName" placeholder="اپنا نام لکھیں" onblur="saveName()">
         </div>
     </div>
 
     <div class="box">
         <h3>کل طے شدہ فاصلہ<br><span id="totalKm">0.00</span> KM</h3>
         <hr>
-        
         <div class="input-group">
             <label>آپ ابھی کس علاقے میں ہیں؟</label>
             <input type="text" id="locationName" placeholder="علاقے کا نام (مثلاً: لیاری)">
         </div>
-
         <button class="start-btn" onclick="setStartPoint()">🚀 نیا سفر یہاں سے شروع کریں</button>
-        <p style="font-size: 11px; color: #8892b0; margin-top: 5px;">دن کے آغاز میں موجودہ علاقے کا نام لکھ کر یہ دبائیں</p>
-        
         <hr>
-
         <div class="input-group">
             <label>یہاں آنے کی وجہ؟</label>
-            <input type="text" id="reason" placeholder="وجہ لکھیں (مثلاً: میٹنگ / ڈلیوری)">
+            <input type="text" id="reason" placeholder="وجہ لکھیں (مثلاً: میٹنگ)">
         </div>
-        
         <button class="mark-btn" onclick="markLocation()">📍 منزل مقصود محفوظ کریں</button>
+        <div id="cloudStatus">☁️ ڈیٹا گوگل شیٹ میں محفوظ ہو گیا!</div>
     </div>
     
     <button class="export-btn" onclick="downloadExcel()">📥 مہینے کی مکمل ایکسل شیٹ ڈاؤن لوڈ کریں</button>
-    <button class="reset-btn" onclick="resetData()">⚠️ نیا مہینہ شروع کریں (پچھلا ڈیٹا صاف کریں)</button>
+    <button class="reset-btn" onclick="resetData()">⚠️ نیا مہینہ شروع کریں</button>
 
     <script>
+        // === یہاں نیچے کوٹس (" ") کے اندر اپنا گوگل سکرپٹ کا لنک پیسٹ کریں ===
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyEgnbZRhkgUNPphvqHi672Y_iagSsbQFTFXDuqV_SEr6Z93kuVFUEqjr1wO7Fd7uBBwg/exec";
+
         let records = JSON.parse(localStorage.getItem('mileageRecords')) || [];
         let totalDistance = parseFloat(localStorage.getItem('totalDistance')) || 0;
         let lastLat = parseFloat(localStorage.getItem('lastLat')) || null;
         let lastLon = parseFloat(localStorage.getItem('lastLon')) || null;
         let lastLocationName = localStorage.getItem('lastLocationName') || "نامعلوم";
         
-        // نام لوڈ کریں
         let savedName = localStorage.getItem('userName') || "";
         document.getElementById('userName').value = savedName;
-
         document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
 
-        function saveName() {
-            let name = document.getElementById('userName').value;
-            localStorage.setItem('userName', name);
-        }
+        function saveName() { localStorage.setItem('userName', document.getElementById('userName').value); }
 
         function setStartPoint() {
             let currentLocName = document.getElementById('locationName').value;
-            if (!currentLocName) {
-                alert("براہ کرم پہلے علاقے کا نام لکھیں!");
-                return;
-            }
-
+            if (!currentLocName) { alert("براہ کرم علاقے کا نام لکھیں!"); return; }
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     lastLat = position.coords.latitude;
                     lastLon = position.coords.longitude;
                     lastLocationName = currentLocName;
-                    
                     localStorage.setItem('lastLat', lastLat);
                     localStorage.setItem('lastLon', lastLon);
                     localStorage.setItem('lastLocationName', lastLocationName);
-                    
-                    alert("✅ شروعات سیٹ ہو گئی! (" + lastLocationName + ") سے سفر شروع۔");
-                }, () => { 
-                    alert("GPS آن کریں اور اجازت دیں!"); 
-                }, { enableHighAccuracy: true });
-            } else { alert("GPS سپورٹ نہیں ہے۔"); }
+                    alert("✅ شروعات سیٹ ہو گئی!");
+                }, () => { alert("GPS آن کریں!"); }, { enableHighAccuracy: true });
+            }
         }
 
         function markLocation() {
             let currentLocName = document.getElementById('locationName').value;
             let reason = document.getElementById('reason').value;
+            let userName = document.getElementById('userName').value || "Unknown";
             
-            if (!currentLocName || !reason) { 
-                alert("علاقے کا نام اور وجہ دونوں لکھیں!"); return; 
-            }
+            if (!currentLocName || !reason) { alert("علاقے کا نام اور وجہ لکھیں!"); return; }
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
@@ -172,16 +106,23 @@
                         totalDistance += distance;
                     }
 
-                    lastLat = lat;
-                    lastLon = lon;
-                    lastLocationName = currentLocName;
+                    lastLat = lat; lastLon = lon; lastLocationName = currentLocName;
                     
                     let now = new Date();
                     let date = now.toLocaleDateString('en-GB'); 
                     let time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-                    records.push({ date, time, route: fullRoute, tripDistance: distance.toFixed(2), totalDistance: totalDistance.toFixed(2), reason });
-                    
+                    let rowData = { 
+                        date: date, 
+                        time: time, 
+                        userName: userName,
+                        route: fullRoute, 
+                        tripDistance: distance.toFixed(2), 
+                        totalDistance: totalDistance.toFixed(2), 
+                        reason: reason 
+                    };
+
+                    records.push(rowData);
                     localStorage.setItem('mileageRecords', JSON.stringify(records));
                     localStorage.setItem('totalDistance', totalDistance);
                     localStorage.setItem('lastLat', lastLat);
@@ -191,56 +132,51 @@
                     document.getElementById('totalKm').innerText = totalDistance.toFixed(2);
                     document.getElementById('locationName').value = '';
                     document.getElementById('reason').value = '';
+                    
+                    if(GOOGLE_SHEET_URL && GOOGLE_SHEET_URL.startsWith("http")) {
+                        fetch(GOOGLE_SHEET_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(rowData)
+                        }).then(() => {
+                            let statusMsg = document.getElementById('cloudStatus');
+                            statusMsg.style.display = 'block';
+                            setTimeout(() => { statusMsg.style.display = 'none'; }, 4000);
+                        }).catch(e => console.log(e));
+                    }
+
                     alert("✅ فاصلہ محفوظ ہو گیا!");
                 }, () => { alert("GPS آن کریں!"); }, { enableHighAccuracy: true });
             }
         }
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            let R = 6371; 
-            let dLat = (lat2 - lat1) * Math.PI / 180;
-            let dLon = (lon2 - lon1) * Math.PI / 180;
+            let R = 6371; let dLat = (lat2 - lat1) * Math.PI / 180; let dLon = (lon2 - lon1) * Math.PI / 180;
             let a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             return R * c;
         }
 
         function downloadExcel() {
-            if (records.length === 0) { 
-                alert("ڈاؤن لوڈ کرنے کے لیے کوئی ریکارڈ نہیں ہے!"); return; 
-            }
-            
-            // شیٹ میں نام اور مہینہ ڈالنے کا عمل
-            let userName = document.getElementById('userName').value || "Unknown Employee";
-            let currentMonth = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' }); // مثال: September 2026
-            
+            if (records.length === 0) { alert("ڈاؤن لوڈ کرنے کے لیے کوئی ریکارڈ نہیں ہے!"); return; }
+            let userName = document.getElementById('userName').value || "Unknown";
+            let currentMonth = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
             let csvContent = `Employee Name:,${userName}\nMonth:,${currentMonth}\n\n`;
-            csvContent += "Date,Time,Route(Area to Area),Trip_Distance(KM),Total_Distance(KM),Reason\n";
-            
-            records.forEach(row => {
-                csvContent += `${row.date},${row.time},${row.route},${row.tripDistance},${row.totalDistance},${row.reason}\n`;
-            });
-
+            csvContent += "Date,Time,Route,Trip_Distance,Total_Distance,Reason\n";
+            records.forEach(row => { csvContent += `${row.date},${row.time},${row.route},${row.tripDistance},${row.totalDistance},${row.reason}\n`; });
             let blob = new Blob(["\uFEFF"+csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
-            
-            // فائل کا نام بھی آپ کے نام اور مہینے کے حساب سے سیو ہوگا
-            let fileName = `Mileage_Report_${userName.replace(/\s+/g, '_')}_${currentMonth.replace(/\s+/g, '_')}.csv`;
-            
-            let url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", `Mileage_Report_${userName.replace(/\s+/g, '_')}_${currentMonth.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
         function resetData() {
-            if(confirm("کیا آپ واقعی نیا مہینہ شروع کرنا چاہتے ہیں؟ پچھلا ریکارڈ ڈیلیٹ ہو جائے گا۔")) {
+            if(confirm("کیا آپ واقعی نیا مہینہ شروع کرنا चाहते ہیں؟")) {
                 let nameToKeep = localStorage.getItem('userName');
                 localStorage.clear();
-                if(nameToKeep) localStorage.setItem('userName', nameToKeep); // نام ڈیلیٹ نہ ہو
+                if(nameToKeep) localStorage.setItem('userName', nameToKeep);
                 location.reload();
             }
         }
